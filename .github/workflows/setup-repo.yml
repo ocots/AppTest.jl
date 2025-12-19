@@ -3,6 +3,10 @@ name: Setup Repository
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -135,6 +139,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "feat: automate repository setup"
           branch: "chore/auto-setup"
           delete-branch: true
@@ -158,7 +163,7 @@ jobs:
             1. Review the changes carefully
             2. Verify that all files have been updated correctly
             3. Merge this PR to finalize the setup
-            4. Delete the `Setup.yml` workflow file (optional)
+            4. Delete the `setup-repo.yml` workflow file (optional)
             
             ---
             *This PR was automatically created by the repository setup workflow.*
