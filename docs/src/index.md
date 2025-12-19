@@ -1,6 +1,6 @@
-# CTAppTemplate
+# AppTest
 
-Documentation for [CTAppTemplate](https://github.com/control-toolbox/CTAppTemplate.jl).
+Documentation for [AppTest](https://github.com/ocots/AppTest.jl).
 
 ## Reproducibility
 

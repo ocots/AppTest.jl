@@ -1,4 +1,4 @@
-module CTAppTemplate
+module AppTest
 
 greet() = print("Hello World!")
 
