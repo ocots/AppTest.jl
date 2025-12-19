@@ -79,18 +79,8 @@ jobs:
               echo "  Updated: $file"
           done
           
-          # 2. Replace package name in files
-          echo "Step 2: Replacing package name..."
-          find . -type f \
-            -not -path "./.git/*" \
-            -not -path "./.github/workflows/setup-repo.yml" \
-            -exec grep -l "$OLD_PACKAGE" {} \; 2>/dev/null | while read -r file; do
-              sed -i "s|$OLD_PACKAGE|$NEW_PACKAGE|g" "$file"
-              echo "  Updated: $file"
-          done
-
-          # 3. Replace control-toolbox.org URLs with GitHub Pages URLs for non-control-toolbox repos
-          echo "Step 3: Updating documentation URLs..."
+          # 2. Replace control-toolbox.org URLs with GitHub Pages URLs for non-control-toolbox repos
+          echo "Step 2: Updating documentation URLs..."
           REPO_OWNER=$(echo "$NEW_REPO" | cut -d'/' -f1)
           if [[ "$REPO_OWNER" != "control-toolbox" ]]; then
             OLD_DOC_URL="control-toolbox.org/CTAppTemplate.jl"
@@ -103,6 +93,16 @@ jobs:
                 echo "  Updated: $file"
             done
           fi
+
+          # 3. Replace package name in files
+          echo "Step 3: Replacing package name..."
+          find . -type f \
+            -not -path "./.git/*" \
+            -not -path "./.github/workflows/setup-repo.yml" \
+            -exec grep -l "$OLD_PACKAGE" {} \; 2>/dev/null | while read -r file; do
+              sed -i "s|$OLD_PACKAGE|$NEW_PACKAGE|g" "$file"
+              echo "  Updated: $file"
+          done
 
           # 4. Rename source file
           echo "Step 4: Renaming source file..."
