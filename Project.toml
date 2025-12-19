@@ -1,6 +1,6 @@
-name = "CTAppTemplate"
-uuid = "eb604665-d64b-4d02-aa6d-8b42324a08dc"
-authors = ["Olivier Cots <olivier.cots@toulouse-inp.fr>"]
+name = "AppTest"
+uuid = "485f204a-fa0e-449b-a484-24171a904367"
+authors = ["Olivier Cots"]
 version = "0.1.0"
 
 [compat]
