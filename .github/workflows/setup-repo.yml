@@ -6,7 +6,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  workflows: write
 
 jobs:
   setup:
@@ -70,11 +69,11 @@ jobs:
           echo "Actor: $ACTOR"
           echo "Author: $AUTHOR_STRING"
           
-          # 1. Replace repo name in files (excluding .git and workflows)
+          # 1. Replace repo name in files (excluding .git and setup-repo.yml)
           echo "Step 1: Replacing repository name..."
           find . -type f \
             -not -path "./.git/*" \
-            -not -path "./.github/workflows/Setup.yml" \
+            -not -path "./.github/workflows/setup-repo.yml" \
             -exec grep -l "$OLD_REPO" {} \; 2>/dev/null | while read -r file; do
               sed -i "s|$OLD_REPO|$NEW_REPO|g" "$file"
               echo "  Updated: $file"
@@ -84,7 +83,7 @@ jobs:
           echo "Step 2: Replacing package name..."
           find . -type f \
             -not -path "./.git/*" \
-            -not -path "./.github/workflows/Setup.yml" \
+            -not -path "./.github/workflows/setup-repo.yml" \
             -exec grep -l "$OLD_PACKAGE" {} \; 2>/dev/null | while read -r file; do
               sed -i "s|$OLD_PACKAGE|$NEW_PACKAGE|g" "$file"
               echo "  Updated: $file"
