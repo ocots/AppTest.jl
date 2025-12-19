@@ -32,46 +32,57 @@ jobs:
           USER_NAME=$(echo "$USER_INFO" | jq -r '.name // ""')
           USER_EMAIL=$(echo "$USER_INFO" | jq -r '.email // ""')
           if [[ -n "$USER_NAME" && -n "$USER_EMAIL" ]]; then
-            AUTHOR_STRING="[\"$USER_NAME <$USER_EMAIL>\"]"
+            AUTHOR_STRING=$(jq -n --arg name "$USER_NAME" --arg email "$USER_EMAIL" '["\($name) <\($email)>"]')
           elif [[ -n "$USER_NAME" ]]; then
-            AUTHOR_STRING="[\"$USER_NAME\"]"
+            AUTHOR_STRING=$(jq -n --arg name "$USER_NAME" '["\($name)"]')
           else
-            AUTHOR_STRING="[\"${{ github.actor }}\"]"
+            AUTHOR_STRING=$(jq -n --arg actor "${{ github.actor }}" '["\($actor)"]')
           fi
           echo "author_string=$AUTHOR_STRING" >> $GITHUB_OUTPUT
 
       - name: Run setup script
         run: |
+          set -e
+          
           # 1. Replace repo name and package name
           OLD_REPO="control-toolbox/CTAppTemplate.jl"
           NEW_REPO="${{ steps.meta.outputs.repo_name }}"
           OLD_PACKAGE="CTAppTemplate"
           NEW_PACKAGE="${{ steps.meta.outputs.package_name }}"
+          ACTOR="${{ steps.meta.outputs.actor }}"
           
           echo "Replacing '$OLD_REPO' with '$NEW_REPO'"
-          find . -type f -not -path "./.git/*" -exec sed -i "s|$OLD_REPO|$NEW_REPO|g" {} +
+          find . -type f -not -path "./.git/*" -not -path "./.github/workflows/*" -exec sed -i "s|$OLD_REPO|$NEW_REPO|g" {} +
           
           echo "Replacing '$OLD_PACKAGE' with '$NEW_PACKAGE'"
-          find . -type f -not -path "./.git/*" -exec sed -i "s|$OLD_PACKAGE|$NEW_PACKAGE|g" {} +
+          find . -type f -not -path "./.git/*" -not -path "./.github/workflows/*" -exec sed -i "s|$OLD_PACKAGE|$NEW_PACKAGE|g" {} +
 
           # 2. Rename source file
           echo "Renaming src/$OLD_PACKAGE.jl to src/$NEW_PACKAGE.jl"
           if [ -f "src/$OLD_PACKAGE.jl" ]; then
-            mv src/$OLD_PACKAGE.jl src/$NEW_PACKAGE.jl
+            mv "src/$OLD_PACKAGE.jl" "src/$NEW_PACKAGE.jl"
           else
             echo "Warning: src/$OLD_PACKAGE.jl not found, skipping rename."
           fi
 
           # 3. Update metadata in Project.toml
           echo "Updating Project.toml"
-          NEW_UUID=$(uuidgen)
+          if [ ! -f "Project.toml" ]; then
+            echo "Error: Project.toml not found"
+            exit 1
+          fi
+          NEW_UUID=$(python3 -c "import uuid; print(uuid.uuid4())")
           sed -i "s/^uuid = .*/uuid = \"$NEW_UUID\"/" Project.toml
           sed -i "s|^authors = .*|authors = ${{ steps.author.outputs.author_string }}|" Project.toml
           
           # 4. Update assignees
-          echo "Updating default assignees to '${{ steps.meta.outputs.actor }}'"
-          find .github/ISSUE_TEMPLATE -type f -name "*.md" -exec sed -i 's/assignees: ocots/assignees: ${{ steps.meta.outputs.actor }}/g' {} +
-          sed -i 's/assignees: ocots/assignees: ${{ steps.meta.outputs.actor }}/g' .github/workflows/AutoAssign.yml
+          echo "Updating default assignees to '$ACTOR'"
+          if [ -d ".github/ISSUE_TEMPLATE" ]; then
+            find .github/ISSUE_TEMPLATE -type f -name "*.md" -exec sed -i "s|assignees: ocots|assignees: $ACTOR|g" {} +
+          fi
+          if [ -f ".github/workflows/AutoAssign.yml" ]; then
+            sed -i "s|assignees: ocots|assignees: $ACTOR|g" .github/workflows/AutoAssign.yml
+          fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
