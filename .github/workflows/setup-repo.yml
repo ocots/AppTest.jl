@@ -89,8 +89,23 @@ jobs:
               echo "  Updated: $file"
           done
 
-          # 3. Rename source file
-          echo "Step 3: Renaming source file..."
+          # 3. Replace control-toolbox.org URLs with GitHub Pages URLs for non-control-toolbox repos
+          echo "Step 3: Updating documentation URLs..."
+          REPO_OWNER=$(echo "$NEW_REPO" | cut -d'/' -f1)
+          if [[ "$REPO_OWNER" != "control-toolbox" ]]; then
+            OLD_DOC_URL="control-toolbox.org/CTAppTemplate.jl"
+            NEW_DOC_URL="${REPO_OWNER}.github.io/${NEW_PACKAGE}.jl"
+            find . -type f \
+              -not -path "./.git/*" \
+              -not -path "./.github/workflows/setup-repo.yml" \
+              -exec grep -l "$OLD_DOC_URL" {} \; 2>/dev/null | while read -r file; do
+                sed -i "s|$OLD_DOC_URL|$NEW_DOC_URL|g" "$file"
+                echo "  Updated: $file"
+            done
+          fi
+
+          # 4. Rename source file
+          echo "Step 4: Renaming source file..."
           if [ -f "src/$OLD_PACKAGE.jl" ]; then
             mv "src/$OLD_PACKAGE.jl" "src/$NEW_PACKAGE.jl"
             echo "  Renamed: src/$OLD_PACKAGE.jl -> src/$NEW_PACKAGE.jl"
@@ -98,8 +113,8 @@ jobs:
             echo "  Warning: src/$OLD_PACKAGE.jl not found, skipping rename."
           fi
 
-          # 4. Update Project.toml
-          echo "Step 4: Updating Project.toml..."
+          # 5. Update Project.toml
+          echo "Step 5: Updating Project.toml..."
           if [ ! -f "Project.toml" ]; then
             echo "  Error: Project.toml not found"
             exit 1
@@ -122,8 +137,8 @@ jobs:
           
           echo "  Updated UUID and authors in Project.toml"
           
-          # 5. Update assignees
-          echo "Step 5: Updating assignees..."
+          # 6. Update assignees
+          echo "Step 6: Updating assignees..."
           if [ -d ".github/ISSUE_TEMPLATE" ]; then
             find .github/ISSUE_TEMPLATE -type f -name "*.md" -exec sed -i "s|assignees: ocots|assignees: $ACTOR|g" {} +
             echo "  Updated assignees in issue templates"
