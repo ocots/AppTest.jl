@@ -2,7 +2,7 @@
 
 julia_version = "1.12.3"
 manifest_format = "2.0"
-project_hash = "f1d644e1843bbd5c5692797e68debf9b7767a033"
+project_hash = "433a7abcc2b9b5b9e8af76e9f42ba8d969796f9c"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -16,7 +16,7 @@ version = "0.4.5"
 
 [[deps.AppTest]]
 path = "/home/runner/work/AppTest.jl/AppTest.jl"
-uuid = "d123a0d4-20ba-4bde-9c00-d292ed152e15"
+uuid = "cc8e0ca3-d0a4-47d0-b68b-c78866aa1baf"
 version = "0.1.0"
 
 [[deps.ArgTools]]

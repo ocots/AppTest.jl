@@ -1,5 +1,5 @@
 [deps]
-AppTest = "d123a0d4-20ba-4bde-9c00-d292ed152e15"
+AppTest = "cc8e0ca3-d0a4-47d0-b68b-c78866aa1baf"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 
 [compat]
